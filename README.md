@@ -1,3 +1,5 @@
+Some of the tools here are useful, although mostly specific to my networks and configurations. But expect some crazy shit, too. One might discover three different implementations of an obscure protocol from 1980's or something just as useless.
+
  * `cluenet/` - tools for the [Cluenet](http://cluenet.org/) network
  * `devel/` - not quite finished stuff
  * `dist/` - tools related to distribution of dotfiles and the like

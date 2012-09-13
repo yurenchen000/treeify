@@ -7,20 +7,23 @@ Some of the tools here are useful, although mostly specific to my networks and c
 
 The useful stuff:
 
+ * `misc/motd` – notify about changes in /etc/motd
+ * `music/gnome-mpris-inhibit` – disable idle-suspend in GNOME while music is playing
+ * `music/mpris` – control MPRIS2-capable players
+ * `net/tapchown` – change owner of tun/tap network interfaces (Linux)
+ * `x11/dbus-name` – list, activate, wait for DBus names
+ * `x11/gnome-inhibit` – set and list idle inhibitors in GNOME
+
+The somewhat useful stuff:
+
  * `kerberos/kl` – a better *klist*
  * `kerberos/pklist` – list Kerberos tickets in easy-to-parse form
  * `kerberos/kc` – manage multiple Kerberos credential caches
  * `misc/envcp` – borrow the environment of another process
- * `misc/motd` – notify about changes in /etc/motd
- * `music/gnome-mpris-inhibit` – disable idle-suspend in GNOME while music is playing
- * `music/mpris` – control MPRIS2-capable players
  * `net/getpaste` – dump raw text of pastebin posts
  * `net/mc-presence` – control Empathy IM status
  * `net/rdt` – recursive rDNS trace
- * `net/tapchown` – change owner of tun/tap network interfaces (Linux)
  * `security/git-credential-lib` – read Git credentials from GNOME Keyring or Windows Credential Manager
- * `x11/dbus-name` – list, activate, wait for DBus names
- * `x11/gnome-inhibit` – set and list idle inhibitors in GNOME
 
 The not-really-useful stuff:
 

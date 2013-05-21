@@ -7,7 +7,6 @@ Some of the tools here are useful, although mostly specific to my networks and c
 
 The useful stuff:
 
- * `misc/motd` – notify about changes in /etc/motd
  * `music/gnome-mpris-inhibit` – disable idle-suspend in GNOME while music is playing
  * `music/mpris` – control MPRIS2-capable players
  * `net/tapchown` – change owner of tun/tap network interfaces (Linux)
@@ -16,6 +15,7 @@ The useful stuff:
 
 The somewhat useful stuff:
 
+ * `misc/motd` – notify about changes in /etc/motd
  * `kerberos/kl` – a better *klist*
  * `kerberos/pklist` – list Kerberos tickets in easy-to-parse form
  * `kerberos/kc` – manage multiple Kerberos credential caches
@@ -36,7 +36,6 @@ The not-really-useful stuff:
  * `security/git-credential-netrc` – read Git credentials from standard `~/.netrc` file
  * `security/update-authorized-keys` – update `~/.ssh/authorized_keys` from cron
  * `tools/askpin` – use GPG Agent as a generic password prompter
- * `tools/ck` – query ConsoleKit information
  * `tools/sonyericsson-screencap.py` – capture screenshots from Sony-Ericsson phones
  * `win32/identd` – an Ident server with multi-user support
  * `win32/pathed` – a weird kind of %PATH% editor

@@ -32,6 +32,11 @@ my $path;
 
 sub split_path {
 	my $path = File::Spec->canonpath(shift);
+	if ($path ne "." && $path !~ m|^/|) {
+		# try to avoid the root branch having [".", "foo", "bar"] when
+		# the input is [".", "./foo", "./bar"] and the like
+		$path = "./".$path;
+	}
 	$path =~ s!(^|/) [^/]+ / \.\. (/|$)!$1$2!gx;
 	$path =~ s!^/!!;
 	split m!/!, $path;

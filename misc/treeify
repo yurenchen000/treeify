@@ -30,13 +30,17 @@ my $tree = {};
 my $maxdepth = 0;
 my $path;
 
-sub split_path {
-	my $path = File::Spec->canonpath(shift);
-	if ($path ne "." && $path !~ m|^/|) {
-		# try to avoid the root branch having [".", "foo", "bar"] when
-		# the input is [".", "./foo", "./bar"] and the like
-		$path = "./".$path;
+sub canonpath {
+	my $path = shift;
+	if ($path =~ m|^(\./)|) {
+		return $1 . File::Spec->canonpath($path);
+	} else {
+		return File::Spec->canonpath($path);
 	}
+}
+
+sub split_path {
+	my $path = canonpath(shift);
 	$path =~ s!(^|/) [^/]+ / \.\. (/|$)!$1$2!gx;
 	$path =~ s!^/!!;
 	split m!/!, $path;
@@ -93,7 +97,7 @@ for (@ARGV) {
 	if (/^-(\d+)$/) {
 		$maxdepth = $1;
 	} else {
-		$path = $_;
+		$path = canonpath($_);
 	}
 }
 

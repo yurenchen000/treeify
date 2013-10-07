@@ -42,7 +42,7 @@ sub split_path {
 	split m!/!, $path;
 }
 
-sub put {
+sub walk {
 	my $branch = shift;
 	my @path = split_path(shift);
 	for (@path) {
@@ -60,7 +60,7 @@ sub deepcount {
 	return $count;
 }
 
-sub tree {
+sub show {
 	my $branch = shift // $tree;
 	my $depth = shift // 0;
 	my $graph = shift // [];
@@ -84,7 +84,7 @@ sub tree {
 			"\n";
 		next if $shallow;
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{sm} : $GRAPH{se} : "";
-		tree($branch->{$item}, $depth+1, $graph);
+		show($branch->{$item}, $depth+1, $graph);
 	}
 	pop $graph;
 }
@@ -98,11 +98,9 @@ for (@ARGV) {
 }
 
 while (<STDIN>) {
-	chomp; put($tree, $_);
+	chomp; walk($tree, $_);
 }
 
-my $branch = $tree;
-if ($path) {
-	$branch = put($branch, $path);
-}
-tree($branch);
+my $visible = $path ? walk($tree, $path) : $tree;
+
+show($visible);

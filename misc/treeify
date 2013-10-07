@@ -101,6 +101,7 @@ while (<STDIN>) {
 	chomp; walk($tree, $_);
 }
 
-my $visible = $path ? walk($tree, $path) : $tree;
+my $visible = $path ? {$path => walk($tree, $path)}
+                    : $tree;
 
 show($visible);

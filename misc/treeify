@@ -1,0 +1,103 @@
+#!/usr/bin/env perl
+use v5.10.1;
+no warnings;
+use File::Spec;
+
+my $TERM = (-t 1 ? $ENV{TERM} : undef) // "dumb";
+
+my %GRAPH = (
+	sm => "│ ",
+	im => "├─",
+	ie => "└─",
+	se => "  ",
+	ct => do { given ($TERM) {
+		when ("dumb")       { "" }
+		when (/-256color$/) { "\e[38;5;59m" }
+		default             { "\e[36m" }
+	} },
+	cs => do { given ($TERM) {
+		when ("dumb")       { "" }
+		when (/-256color$/) { "\e[38;5;109m" }
+		default             { "\e[36m" }
+	} },
+	cr => do { given ($TERM) {
+		when ("dumb") { "" }
+		default       { "\e[m" }
+	} },
+);
+
+my $tree = {};
+my $maxdepth = 0;
+my $path;
+
+sub split_path {
+	my $path = File::Spec->canonpath(shift);
+	$path =~ s!(^|/) [^/]+ / \.\. (/|$)!$1$2!gx;
+	$path =~ s!^/!!;
+	split m!/!, $path;
+}
+
+sub put {
+	my $branch = shift;
+	my @path = split_path(shift);
+	for (@path) {
+		$branch = $branch->{$_} //= {};
+	}
+	return $branch;
+}
+
+sub deepcount {
+	my $branch = shift;
+	my $count = 0;
+	for (values %$branch) {
+		$count += 1 + deepcount($_);
+	}
+	return $count;
+}
+
+sub tree {
+	my $branch = shift // $tree;
+	my $depth = shift // 0;
+	my $graph = shift // [];
+	my @keys = sort keys %$branch;
+	my $shallow = $maxdepth && $depth >= $maxdepth;
+	while (@keys) {
+		my $item = shift @keys;
+		my $children = keys $branch->{$item};
+		if ($shallow && $children) {
+			$children = deepcount($branch->{$item});
+		}
+		$graph->[$depth] = $depth ? @keys ? $GRAPH{im} : $GRAPH{ie} : "";
+		print	$GRAPH{ct},
+			"@$graph",
+			$children ? $GRAPH{cs} : $GRAPH{cr},
+			$item,
+			$GRAPH{ct},
+			$children ? "/" : "",
+			($shallow && $children) ? " ($children)" : "",
+			$GRAPH{cr},
+			"\n";
+		next if $shallow;
+		$graph->[$depth] = $depth ? @keys ? $GRAPH{sm} : $GRAPH{se} : "";
+		tree($branch->{$item}, $depth+1, $graph);
+	}
+	pop $graph;
+}
+
+for (@ARGV) {
+	if (/^-(\d+)$/) {
+		$maxdepth = $1;
+	} else {
+		$path = $_;
+	}
+}
+
+while (<STDIN>) {
+	chomp; put($tree, $_);
+}
+
+my $branch = $tree;
+if ($path) {
+	$branch = put($branch, $path);
+}
+tree($branch);

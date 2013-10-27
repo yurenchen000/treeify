@@ -29,13 +29,4 @@ The not-really-useful stuff:
 
  * `lib/python/nullroute/authorized_keys` – parse `authorized_keys`
  * `lib/python/nullroute/sexp` – parse Ron Rivest's S-expressions
- * `mail/babyl2mbox` – convert BABYL mailboxes
- * `misc/strtool` – misc string manipulation functions
- * `net/nbls` – list NetBIOS names in current broadcast domain
- * `security/getnetrc` – search `~/.netrc` file
- * `security/git-credential-netrc` – read Git credentials from standard `~/.netrc` file
- * `security/update-authorized-keys` – update `~/.ssh/authorized_keys` from cron
- * `tools/askpin` – use GPG Agent as a generic password prompter
- * `tools/sonyericsson-screencap.py` – capture screenshots from Sony-Ericsson phones
- * `win32/identd` – an Ident server with multi-user support
- * `win32/pathed` – a weird kind of %PATH% editor
+ * meh

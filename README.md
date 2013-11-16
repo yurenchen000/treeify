@@ -1,5 +1,7 @@
 Some of the tools here are useful, although mostly specific to my networks and configurations. But expect some crazy shit, too. One might discover three different implementations of an obscure protocol from 1980's or something just as useless.
 
+(Everything is licensed under WTFPL v2 <http://sam.zoy.org/wtfpl/> unless declared otherwise in specific files. I might switch the default license to MIT, but still not sure about it.)
+
  * `bin` contains symlinks to all scripts, for my $PATH.
  * `dist` has scripts dealing with this repository itself.
  * `obj` is where compiled binaries for C tools go, to allow sharing `~/code` over NFS.

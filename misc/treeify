@@ -79,7 +79,7 @@ sub show {
 	my $shallow = $maxdepth && $depth >= $maxdepth;
 	while (@keys) {
 		my $item = shift @keys;
-		my $children = keys $branch->{$item};
+		my $children = keys %{$branch->{$item}};
 		if ($shallow && $children) {
 			$children = deepcount($branch->{$item});
 		}
@@ -97,7 +97,7 @@ sub show {
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{sm} : $GRAPH{se} : "";
 		show($branch->{$item}, $depth+1, $graph);
 	}
-	pop $graph;
+	pop @$graph;
 }
 
 for (@ARGV) {

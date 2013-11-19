@@ -112,6 +112,10 @@ while (<STDIN>) {
 	chomp; walk($tree, $_);
 }
 
+while ($path && $tree->{"."}) {
+	$tree = $tree->{"."};
+}
+
 my $visible = $path ? {$path => walk($tree, $path)}
                     : $tree;
 

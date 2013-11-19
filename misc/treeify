@@ -1,32 +1,37 @@
 #!/usr/bin/env perl
 # display a list of files as a tree
 
-use v5.10.1;
 no warnings;
+use strict;
 use File::Spec;
 
 my $TERM = (-t 1 ? $ENV{TERM} : undef) // "dumb";
+
+my $TERM256 = $TERM =~ /-256color$/ || $ENV{havecolor} == 256;
 
 my %GRAPH = (
 	sm => "│ ",
 	im => "├─",
 	ie => "└─",
 	se => "  ",
-	ct => do { given ($TERM) {
-		when ("dumb")       { "" }
-		when (/-256color$/) { "\e[38;5;59m" }
-		default             { "\e[36m" }
-	} },
-	cs => do { given ($TERM) {
-		when ("dumb")       { "" }
-		when (/-256color$/) { "\e[38;5;109m" }
-		default             { "\e[36m" }
-	} },
-	cr => do { given ($TERM) {
-		when ("dumb") { "" }
-		default       { "\e[m" }
-	} },
+	ct => "",
+	cs => "",
+	cr => "",
 );
+
+if ($TERM eq "dumb") {
+	$GRAPH{ct} = "";
+	$GRAPH{cs} = "";
+	$GRAPH{cr} = "";
+} elsif ($TERM256) {
+	$GRAPH{ct} = "\e[38;5;59m";
+	$GRAPH{cs} = "\e[38;5;109m";
+	$GRAPH{cr} = "\e[m";
+} else {
+	$GRAPH{ct} = "\e[36m";
+	$GRAPH{cs} = "\e[36m";
+	$GRAPH{cr} = "\e[m";
+}
 
 my $tree = {};
 my $maxdepth = 0;

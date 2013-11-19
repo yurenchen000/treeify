@@ -77,6 +77,15 @@ sub show {
 	my $graph = shift // [];
 	my @keys = sort keys %$branch;
 	my $shallow = $maxdepth && $depth >= $maxdepth;
+	if ($depth == 1 && !@keys) {
+		print	$GRAPH{ct},
+			$GRAPH{ie},
+			$GRAPH{cs},
+			"(empty)",
+			$GRAPH{cr},
+			"\n";
+		return;
+	}
 	while (@keys) {
 		my $item = shift @keys;
 		my $children = keys %{$branch->{$item}};

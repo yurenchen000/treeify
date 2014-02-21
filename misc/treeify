@@ -35,6 +35,7 @@ if ($TERM eq "dumb") {
 
 my $tree = {};
 my $maxdepth = 0;
+my $fakeroot;
 my $path;
 
 sub canonpath {
@@ -112,6 +113,8 @@ sub show {
 for (@ARGV) {
 	if (/^-(\d+)$/) {
 		$maxdepth = $1;
+	} elsif (/^@(.+)$/) {
+		$fakeroot = $1;
 	} else {
 		$path = canonpath($_);
 	}
@@ -127,5 +130,9 @@ while ($path && $tree->{"."}) {
 
 my $visible = $path ? {$path => walk($tree, $path)}
                     : $tree;
+
+if (defined $fakeroot) {
+	$visible = {$fakeroot => ($visible->{"."} // $visible)};
+}
 
 show($visible);

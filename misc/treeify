@@ -79,6 +79,7 @@ sub show {
 	my $branch = shift // $tree;
 	my $depth = shift // 0;
 	my $graph = shift // [];
+	my $root = shift // "";
 	my @keys = sort keys %$branch;
 	my $shallow = $maxdepth && $depth >= $maxdepth;
 	if ($depth == 1 && !@keys) {
@@ -96,10 +97,12 @@ sub show {
 		if ($shallow && $children) {
 			$children = deepcount($branch->{$item});
 		}
+		my $path = $root ? $root."/".$item : $item;
+		my $exists = exists $items->{$path};
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{im} : $GRAPH{ie} : "";
 		print	$GRAPH{ct},
 			"@$graph",
-			$children ? $GRAPH{cs} : $GRAPH{cr},
+			$exists ? $GRAPH{cr} : $GRAPH{cs},
 			$item,
 			$GRAPH{ct},
 			$children ? "/" : "",
@@ -107,8 +110,9 @@ sub show {
 			$GRAPH{cr},
 			"\n";
 		next if $shallow;
+
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{sm} : $GRAPH{se} : "";
-		show($branch->{$item}, $depth+1, $graph);
+		show($branch->{$item}, $depth+1, $graph, $path);
 	}
 	pop @$graph;
 }

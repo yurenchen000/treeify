@@ -108,9 +108,11 @@ sub show {
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{im} : $GRAPH{ie} : "";
 		print	$GRAPH{ct},
 			"@$graph",
+			$exists ? "" : "[",
 			$exists ? $GRAPH{cr} : $GRAPH{cs},
 			$item,
 			$GRAPH{ct},
+			$exists ? "" : "]",
 			$children ? "/" : "",
 			($shallow && $children) ? " ($children)" : "",
 			$GRAPH{cr},

@@ -113,7 +113,6 @@ sub show {
 			$item,
 			$GRAPH{ct},
 			$exists ? "" : "]",
-			$children ? "/" : "",
 			($shallow && $children) ? " ($children)" : "",
 			$GRAPH{cr},
 			"\n";

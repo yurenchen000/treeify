@@ -80,8 +80,10 @@ sub show {
 	my $depth = shift // 0;
 	my $graph = shift // [];
 	my $root = shift // "";
+
 	my @keys = sort keys %$branch;
 	my $shallow = $maxdepth && $depth >= $maxdepth;
+
 	if ($depth == 1 && !@keys) {
 		print	$GRAPH{ct},
 			$GRAPH{ie},
@@ -91,14 +93,18 @@ sub show {
 			"\n";
 		return;
 	}
+
 	while (@keys) {
 		my $item = shift @keys;
+
 		my $children = keys %{$branch->{$item}};
 		if ($shallow && $children) {
 			$children = deepcount($branch->{$item});
 		}
+
 		my $path = $root ? $root."/".$item : $item;
 		my $exists = exists $items->{$path};
+
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{im} : $GRAPH{ie} : "";
 		print	$GRAPH{ct},
 			"@$graph",

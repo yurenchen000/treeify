@@ -34,6 +34,7 @@ if ($TERM eq "dumb") {
 }
 
 my $tree = {};
+my $items = {};
 my $maxdepth = 0;
 my $fakeroot;
 my $path;
@@ -57,9 +58,11 @@ sub split_path {
 sub walk {
 	my $branch = shift;
 	my @path = split_path(shift);
+	my $path = join "/", @path;
 	for (@path) {
 		$branch = $branch->{$_} //= {};
 	}
+	$items->{$path} = 1;
 	return $branch;
 }
 
@@ -76,8 +79,11 @@ sub show {
 	my $branch = shift // $tree;
 	my $depth = shift // 0;
 	my $graph = shift // [];
+	my $root = shift // "";
+
 	my @keys = sort keys %$branch;
 	my $shallow = $maxdepth && $depth >= $maxdepth;
+
 	if ($depth == 1 && !@keys) {
 		print	$GRAPH{ct},
 			$GRAPH{ie},
@@ -87,25 +93,33 @@ sub show {
 			"\n";
 		return;
 	}
+
 	while (@keys) {
 		my $item = shift @keys;
+
 		my $children = keys %{$branch->{$item}};
 		if ($shallow && $children) {
 			$children = deepcount($branch->{$item});
 		}
+
+		my $path = $root ? $root."/".$item : $item;
+		my $exists = exists $items->{$path};
+
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{im} : $GRAPH{ie} : "";
 		print	$GRAPH{ct},
 			"@$graph",
-			$children ? $GRAPH{cs} : $GRAPH{cr},
+			$exists ? "" : "[",
+			$exists ? $GRAPH{cr} : $GRAPH{cs},
 			$item,
 			$GRAPH{ct},
-			$children ? "/" : "",
+			$exists ? "" : "]",
 			($shallow && $children) ? " ($children)" : "",
 			$GRAPH{cr},
 			"\n";
 		next if $shallow;
+
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{sm} : $GRAPH{se} : "";
-		show($branch->{$item}, $depth+1, $graph);
+		show($branch->{$item}, $depth+1, $graph, $path);
 	}
 	pop @$graph;
 }

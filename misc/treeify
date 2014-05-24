@@ -34,6 +34,7 @@ if ($TERM eq "dumb") {
 }
 
 my $tree = {};
+my $items = {};
 my $maxdepth = 0;
 my $fakeroot;
 my $path;
@@ -57,9 +58,11 @@ sub split_path {
 sub walk {
 	my $branch = shift;
 	my @path = split_path(shift);
+	my $path = join "/", @path;
 	for (@path) {
 		$branch = $branch->{$_} //= {};
 	}
+	$items->{$path} = 1;
 	return $branch;
 }
 

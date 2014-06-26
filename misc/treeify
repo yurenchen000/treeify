@@ -51,18 +51,19 @@ sub canonpath {
 sub split_path {
 	my $path = canonpath(shift);
 	$path =~ s!(^|/) [^/]+ / \.\. (/|$)!$1$2!gx;
-	$path =~ s!^/!!;
-	split m!/!, $path;
+	$path =~ s!^/+!!;
+	split m!/+!, $path;
 }
 
 sub walk {
 	my $branch = shift;
 	my @path = split_path(shift);
 	my $path = join "/", ($fakeroot ? $fakeroot : ()), @path;
+	my $head = $fakeroot ? "/".$fakeroot : "";
 	for (@path) {
 		$branch = $branch->{$_} //= {};
+		$items->{$head .= "/".$_} = 1;
 	}
-	$items->{$path} = 1;
 	return $branch;
 }
 
@@ -103,7 +104,7 @@ sub show {
 		}
 
 		my $path = $root ? $root."/".$item : $item;
-		my $exists = exists $items->{$path};
+		my $exists = exists $items->{"/".$path};
 
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{im} : $GRAPH{ie} : "";
 		print	$GRAPH{ct},
@@ -131,6 +132,7 @@ for (@ARGV) {
 		$fakeroot = $1;
 	} else {
 		$path = canonpath($_);
+		$path =~ s!^/+!!;
 	}
 }
 

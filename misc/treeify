@@ -95,6 +95,8 @@ sub show {
 		return;
 	}
 
+	$root =~ s!^/+!!;
+
 	while (@keys) {
 		my $item = shift @keys;
 
@@ -132,7 +134,6 @@ for (@ARGV) {
 		$fakeroot = $1;
 	} else {
 		$path = canonpath($_);
-		$path =~ s!^/+!!;
 	}
 }
 

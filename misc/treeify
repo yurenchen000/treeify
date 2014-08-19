@@ -76,13 +76,15 @@ sub walk {
 	my @path = split_path($path);
 	my $head = $fakeroot ? "/".$fakeroot : "";
 	_debug("split path: <@path>");
-	for (@path) {
-		_debug("  head <$head> item <$_>");
-		$branch = $branch->{$_} //= {};
-		$head .= "/".$_;
+	if (@path) {
+		for (@path) {
+			_debug("  head <$head> item <$_>");
+			$branch = $branch->{$_} //= {};
+			$head .= "/".$_;
+		}
+		_debug("  -> head <$head>");
+		$items->{$head} = 1;
 	}
-	_debug("  -> head <$head>");
-	$items->{$head} = 1;
 	return $branch;
 }
 

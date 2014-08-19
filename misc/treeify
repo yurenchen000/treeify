@@ -79,7 +79,6 @@ sub walk {
 		for (@path) {
 			$branch = $branch->{$_} //= {};
 		}
-		$seen->{$branch} = 1;
 	}
 	return $branch;
 }
@@ -148,7 +147,9 @@ for (@ARGV) {
 }
 
 while (<STDIN>) {
-	chomp; walk($tree, $_);
+	chomp;
+	my $node = walk($tree, $_);
+	$seen->{$node} = 1;
 }
 
 while ($path && $tree->{"."}) {

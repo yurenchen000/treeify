@@ -61,9 +61,13 @@ sub canonpath {
 
 sub split_path {
 	my $path = canonpath(shift);
-	$path =~ s!(^|/) [^/]+ / \.\. (/|$)!$1$2!gx;
-	$path =~ s!^/+!!;
-	split m!/+!, $path;
+	my @path;
+	for (split(m!/+!, $path)) {
+		if ($_ eq ".")     { next; }
+		elsif ($_ eq "..") { pop @path; }
+		else               { push @path, $_; }
+	}
+	@path;
 }
 
 sub walk {
@@ -74,7 +78,6 @@ sub walk {
 	_debug("split path: <@path>");
 	for (@path) {
 		_debug("  head <$head> item <$_>");
-		next if $_ eq ".";
 		$branch = $branch->{$_} //= {};
 		$items->{$head .= "/".$_} = 1;
 	}

@@ -1,9 +1,20 @@
 #!/usr/bin/env perl
 # display a list of files as a tree
-
 no warnings;
 use strict;
 use File::Spec;
+
+BEGIN {
+	if (eval {require Nullroute::Lib}) {
+		Nullroute::Lib->import(qw(_debug _warn _err _die));
+	} else {
+		our ($warnings, $errors);
+		sub _debug { warn "debug: @_\n" if $ENV{DEBUG}; }
+		sub _warn  { warn "warning: @_\n"; ++$::warnings; }
+		sub _err   { warn "error: @_\n"; ! ++$::errors; }
+		sub _die   { _err(@_); exit 1; }
+	}
+}
 
 my $TERM = (-t 1 ? $ENV{TERM} : undef) // "dumb";
 
@@ -56,10 +67,13 @@ sub split_path {
 }
 
 sub walk {
-	my $branch = shift;
-	my @path = split_path(shift);
+	my ($branch, $path) = @_;
+	_debug("walking down $branch to $path");
+	my @path = split_path($path);
 	my $head = $fakeroot ? "/".$fakeroot : "";
+	_debug("split path: <@path>");
 	for (@path) {
+		_debug("  head <$head> / item <$_>");
 		$branch = $branch->{$_} //= {};
 		$items->{$head .= "/".$_} = 1;
 	}

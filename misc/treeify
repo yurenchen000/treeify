@@ -106,16 +106,6 @@ sub show {
 	my @keys = sort keys %$branch;
 	my $shallow = $maxdepth && $depth >= $maxdepth;
 
-	if ($depth == 1 && !@keys) {
-		print	$GRAPH{ct},
-			$GRAPH{ie},
-			$GRAPH{cs},
-			"(empty)",
-			$GRAPH{cr},
-			"\n";
-		return;
-	}
-
 	$root =~ s!^/+!!;
 
 	while (@keys) {
@@ -145,6 +135,7 @@ sub show {
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{sm} : $GRAPH{se} : "";
 		show($branch->{$item}, $depth+1, $graph, $path);
 	}
+
 	pop @$graph;
 }
 

@@ -73,7 +73,8 @@ sub walk {
 	my $head = $fakeroot ? "/".$fakeroot : "";
 	_debug("split path: <@path>");
 	for (@path) {
-		_debug("  head <$head> / item <$_>");
+		_debug("  head <$head> item <$_>");
+		next if $_ eq ".";
 		$branch = $branch->{$_} //= {};
 		$items->{$head .= "/".$_} = 1;
 	}
@@ -162,7 +163,7 @@ my $visible = $path ? {$path => walk($tree, $path)}
                     : $tree;
 
 if (defined $fakeroot) {
-	$visible = {$fakeroot => ($visible->{"."} // $visible)};
+	$visible = {$fakeroot => $visible};
 }
 
 show($visible);

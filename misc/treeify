@@ -58,7 +58,6 @@ sub split_path {
 sub walk {
 	my $branch = shift;
 	my @path = split_path(shift);
-	my $path = join "/", ($fakeroot ? $fakeroot : ()), @path;
 	my $head = $fakeroot ? "/".$fakeroot : "";
 	for (@path) {
 		$branch = $branch->{$_} //= {};

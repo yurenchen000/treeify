@@ -63,9 +63,10 @@ sub split_path {
 	my $path = canonpath(shift);
 	my @path;
 	for (split(m!/+!, $path)) {
-		if ($_ eq ".")     { next; }
-		elsif ($_ eq "..") { pop @path; }
-		else               { push @path, $_; }
+		if ($_ eq "")		{ push @path, "/"; }
+		elsif ($_ eq ".")	{ next; }
+		elsif ($_ eq "..")	{ pop @path; }
+		else			{ push @path, $_; }
 	}
 	@path;
 }

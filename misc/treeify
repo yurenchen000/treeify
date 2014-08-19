@@ -45,7 +45,7 @@ if ($TERM eq "dumb") {
 }
 
 my $tree = {};
-my $items = {};
+my $seen = {};
 my $maxdepth = 0;
 my $fakeroot;
 my $path;
@@ -79,7 +79,7 @@ sub walk {
 		for (@path) {
 			$branch = $branch->{$_} //= {};
 		}
-		$items->{$branch} = 1;
+		$seen->{$branch} = 1;
 	}
 	return $branch;
 }
@@ -114,7 +114,7 @@ sub show {
 		}
 
 		my $path = $root ? $root."/".$name : $name;
-		my $exists = exists $items->{$node};
+		my $exists = exists $seen->{$node};
 
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{im} : $GRAPH{ie} : "";
 		print	$GRAPH{ct},

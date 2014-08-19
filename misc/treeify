@@ -75,14 +75,10 @@ sub walk {
 	my @path = split_path($path);
 	_debug("walking down '$path' <@path>");
 	if (@path) {
-		my $head = $fakeroot ? "/".$fakeroot : "";
 		for (@path) {
-			_debug("  head <$head> item <$_>");
 			$branch = $branch->{$_} //= {};
-			$head .= "/".$_;
 		}
-		_debug("  -> head <$head>");
-		$items->{$head} = 1;
+		$items->{$branch} = 1;
 	}
 	return $branch;
 }
@@ -116,7 +112,7 @@ sub show {
 		}
 
 		my $path = $root ? $root."/".$item : $item;
-		my $exists = exists $items->{"/".$path};
+		my $exists = exists $items->{$branch->{$item}};
 
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{im} : $GRAPH{ie} : "";
 		print	$GRAPH{ct},

@@ -72,11 +72,10 @@ sub split_path {
 
 sub walk {
 	my ($branch, $path) = @_;
-	_debug("walking down $branch to $path");
 	my @path = split_path($path);
-	my $head = $fakeroot ? "/".$fakeroot : "";
-	_debug("split path: <@path>");
+	_debug("walking down '$path' <@path>");
 	if (@path) {
+		my $head = $fakeroot ? "/".$fakeroot : "";
 		for (@path) {
 			_debug("  head <$head> item <$_>");
 			$branch = $branch->{$_} //= {};
@@ -127,6 +126,7 @@ sub show {
 			$item,
 			$GRAPH{ct},
 			$exists ? "" : "]",
+			$::debug ? " <$root>" : "",
 			($shallow && $children) ? " ($children)" : "",
 			$GRAPH{cr},
 			"\n";
@@ -157,10 +157,15 @@ while ($path && $tree->{"."}) {
 	$tree = $tree->{"."};
 }
 
-my $visible = $path ? {$path => walk($tree, $path)}
-                    : $tree;
+my $visible = $tree;
+
+if ($path) {
+	_debug("--> descending to '$path'");
+	$visible = {$path => walk($visible, $path)};
+}
 
 if (defined $fakeroot) {
+	_debug("<-- prepending fake '$fakeroot'");
 	$visible = {$fakeroot => $visible};
 }
 

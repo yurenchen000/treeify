@@ -104,22 +104,23 @@ sub show {
 	$root =~ s!^/+!!;
 
 	while (@keys) {
-		my $item = shift @keys;
+		my $name = shift @keys;
+		my $node = $branch->{$name};
 
-		my $children = keys %{$branch->{$item}};
+		my $children = keys %$node;
 		if ($shallow && $children) {
-			$children = deepcount($branch->{$item});
+			$children = deepcount($node);
 		}
 
-		my $path = $root ? $root."/".$item : $item;
-		my $exists = exists $items->{$branch->{$item}};
+		my $path = $root ? $root."/".$name : $name;
+		my $exists = exists $items->{$node};
 
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{im} : $GRAPH{ie} : "";
 		print	$GRAPH{ct},
 			"@$graph",
 			$exists ? "" : "[",
 			$exists ? $GRAPH{cr} : $GRAPH{cs},
-			$item,
+			$name,
 			$GRAPH{ct},
 			$exists ? "" : "]",
 			$::debug ? " <$root>" : "",
@@ -129,7 +130,7 @@ sub show {
 		next if $shallow;
 
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{sm} : $GRAPH{se} : "";
-		show($branch->{$item}, $depth+1, $graph, $path);
+		show($node, $depth+1, $graph, $path);
 	}
 
 	pop @$graph;

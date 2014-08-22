@@ -64,6 +64,7 @@ sub split_path {
 	my @path;
 	for (split(m!/+!, $path)) {
 		if ($_ eq "")		{ push @path, "/"; }
+		elsif (!@path)		{ push @path, $_; }
 		elsif ($_ eq ".")	{ next; }
 		elsif ($_ eq "..")	{ pop @path; }
 		else			{ push @path, $_; }

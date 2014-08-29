@@ -76,10 +76,8 @@ sub walk {
 	my ($branch, $path) = @_;
 	my @path = split_path($path);
 	_debug("walking down '$path' <@path>");
-	if (@path) {
-		for (@path) {
-			$branch = $branch->{$_} //= {};
-		}
+	for (@path) {
+		$branch = $branch->{$_} //= {};
 	}
 	return $branch;
 }

@@ -49,6 +49,7 @@ my $seen = {};
 my $maxdepth = 0;
 my $fakeroot;
 my $path;
+my $ghost = 1;
 
 sub canonpath {
 	my $path = shift;
@@ -112,7 +113,7 @@ sub show {
 		}
 
 		my $path = $root ? $root."/".$name : $name;
-		my $exists = exists $seen->{$node};
+		my $exists = !$ghost || exists $seen->{$node};
 
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{im} : $GRAPH{ie} : "";
 		print	$GRAPH{ct},
@@ -138,6 +139,8 @@ sub show {
 for (@ARGV) {
 	if (/^-(\d+)$/) {
 		$maxdepth = $1;
+	} elsif (/^-g$/) {
+		$ghost = 0;
 	} elsif (/^@(.+)$/) {
 		$fakeroot = $1;
 	} else {

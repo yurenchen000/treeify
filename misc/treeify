@@ -51,6 +51,13 @@ my $fakeroot;
 my $path;
 my $ghost = 1;
 
+sub _dump {
+	if ($::debug > 1) {
+		use Data::Dumper;
+		print Data::Dumper->new([shift])->Indent(1)->Dump;
+	}
+}
+
 sub canonpath {
 	my $path = shift;
 	if ($path =~ m|^(\./)|) {
@@ -159,15 +166,18 @@ while ($path && $tree->{"."}) {
 }
 
 my $visible = $tree;
+_dump($visible);
 
 if ($path) {
 	_debug("--> descending to '$path'");
 	$visible = {$path => walk($visible, $path)};
+	_dump($visible);
 }
 
 if (defined $fakeroot) {
 	_debug("<-- prepending fake '$fakeroot'");
 	$visible = {$fakeroot => $visible};
+	_dump($visible);
 }
 
 show($visible);

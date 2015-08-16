@@ -49,6 +49,7 @@ my $seen = {};
 my $maxdepth = 0;
 my $fakeroot;
 my $path;
+my $printfull = 0;
 my $ghost = 1;
 
 sub _dump {
@@ -127,7 +128,7 @@ sub show {
 			"@$graph",
 			$exists ? "" : "[",
 			$exists ? $GRAPH{cr} : $GRAPH{cs},
-			$name,
+			$printfull ? $path : $name,
 			$GRAPH{ct},
 			$exists ? "" : "]",
 			$::debug ? " <$root>" : "",
@@ -148,6 +149,8 @@ for (@ARGV) {
 		$maxdepth = $1;
 	} elsif (/^-g$/) {
 		$ghost = 0;
+	} elsif (/^-f$/) {
+		$printfull = 1;
 	} elsif (/^@(.+)$/) {
 		$fakeroot = $1;
 	} else {

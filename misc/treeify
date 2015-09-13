@@ -8,7 +8,10 @@ BEGIN {
 	if (eval {require Nullroute::Lib}) {
 		Nullroute::Lib->import(qw(_debug _warn _err _die));
 	} else {
-		our ($warnings, $errors);
+		$::arg0 = (split m!/!, $0)[-1];
+		$::debug = !!$ENV{DEBUG};
+		$::warnings = 0;
+		$::errors = 0;
 		sub _debug { warn "debug: @_\n" if $ENV{DEBUG}; }
 		sub _warn  { warn "warning: @_\n"; ++$::warnings; }
 		sub _err   { warn "error: @_\n"; ! ++$::errors; }

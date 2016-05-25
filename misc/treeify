@@ -55,7 +55,7 @@ my $maxdepth = 0;
 my $fakeroot;
 my $path;
 my $printfull = 0;
-my $ghost = 1;
+my $noghosts = 0;
 
 sub _dump {
 	if ($::debug > 1) {
@@ -126,7 +126,7 @@ sub show {
 		}
 
 		my $path = $root ? $root.$sep.$name : $name;
-		my $exists = !$ghost || exists $seen->{$node};
+		my $exists = $noghosts || exists $seen->{$node};
 
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{im} : $GRAPH{ie} : "";
 		print	$GRAPH{ct},
@@ -152,7 +152,7 @@ sub show {
 GetOptions(
 	"d|max-depth=i" => \$maxdepth,
 	"f|full-names" => \$printfull,
-	"g|no-ghosts" => sub { $ghost = 0 },
+	"g|no-ghosts" => \$noghosts,
 	"r|fake-root=s" => \$fakeroot,
 	"s|separator=s" => \$sep,
 	map {

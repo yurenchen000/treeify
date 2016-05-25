@@ -47,6 +47,7 @@ if ($TERM eq "dumb") {
 	$GRAPH{cr} = "\e[m";
 }
 
+my $sep = "/";
 my $tree = {};
 my $seen = {};
 my $maxdepth = 0;
@@ -74,14 +75,14 @@ sub canonpath {
 sub split_path {
 	my $path = canonpath(shift);
 	my @path;
-	for (split(m!/+!, $path)) {
-		if ($_ eq "")		{ push @path, "/"; }
+	for (split(m!\Q$sep\E+!, $path)) {
+		if ($_ eq "")		{ push @path, $sep; }
 		elsif (!@path)		{ push @path, $_; }
 		elsif ($_ eq ".")	{ next; }
 		elsif ($_ eq "..")	{ pop @path; }
 		else			{ push @path, $_; }
 	}
-	return @path ? @path : "/";
+	return @path ? @path : $sep;
 }
 
 sub walk {
@@ -123,7 +124,7 @@ sub show {
 			$children = deepcount($node);
 		}
 
-		my $path = $root ? $root."/".$name : $name;
+		my $path = $root ? $root.$sep.$name : $name;
 		my $exists = !$ghost || exists $seen->{$node};
 
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{im} : $GRAPH{ie} : "";
@@ -154,6 +155,8 @@ for (@ARGV) {
 		$ghost = 0;
 	} elsif (/^-f$/) {
 		$printfull = 1;
+	} elsif (/^-s(.)$/) {
+		$sep = $1;
 	} elsif (/^@(.+)$/) {
 		$fakeroot = $1;
 	} else {

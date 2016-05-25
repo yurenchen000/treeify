@@ -2,6 +2,7 @@
 # display a list of files as a tree
 no warnings;
 use strict;
+use Getopt::Long qw(:config bundling no_ignore_case);
 use File::Spec;
 
 BEGIN {
@@ -148,16 +149,19 @@ sub show {
 	pop @$graph;
 }
 
+GetOptions(
+	"d|max-depth=i" => \$maxdepth,
+	"f|full-names" => \$printfull,
+	"g|no-ghosts" => sub { $ghost = 0 },
+	"r|fake-root=s" => \$fakeroot,
+	"s|separator=s" => \$sep,
+	map {
+		$_ => sub { $maxdepth = ($maxdepth * 10) + int($_[1]) },
+	} 0..9,
+) or exit(2);
+
 for (@ARGV) {
-	if (/^-(\d+)$/) {
-		$maxdepth = $1;
-	} elsif (/^-g$/) {
-		$ghost = 0;
-	} elsif (/^-f$/) {
-		$printfull = 1;
-	} elsif (/^-s(.)$/) {
-		$sep = $1;
-	} elsif (/^@(.+)$/) {
+	if (/^@(.+)$/) {
 		$fakeroot = $1;
 	} else {
 		$path = canonpath($_);

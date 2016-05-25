@@ -53,7 +53,7 @@ my $tree = {};
 my $seen = {};
 my $maxdepth = 0;
 my $fakeroot;
-my $path;
+my $subpath;
 my $printfull = 0;
 my $noghosts = 0;
 
@@ -164,7 +164,7 @@ for (@ARGV) {
 	if (/^@(.+)$/) {
 		$fakeroot = $1;
 	} else {
-		$path = canonpath($_);
+		$subpath = canonpath($_);
 	}
 }
 
@@ -174,16 +174,16 @@ while (<STDIN>) {
 	$seen->{$node} = 1;
 }
 
-while (defined($path) && $tree->{"."}) {
+while (defined($subpath) && $tree->{"."}) {
 	$tree = $tree->{"."};
 }
 
 my $visible = $tree;
 _dump($visible);
 
-if ($path) {
-	_debug("--> descending to '$path'");
-	$visible = {$path => walk($visible, $path)};
+if ($subpath) {
+	_debug("--> descending to '$subpath'");
+	$visible = {$subpath => walk($visible, $subpath)};
 	_dump($visible);
 }
 

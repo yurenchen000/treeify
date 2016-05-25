@@ -48,14 +48,17 @@ if ($TERM eq "dumb") {
 	$GRAPH{cr} = "\e[m";
 }
 
-my $sep = "/";
+my %opt = (
+	fakeroot => undef,
+	maxdepth => 0,
+	noghosts => 0,
+	path => undef,
+	printfull => 0,
+	sep => "/",
+);
+
 my $tree = {};
 my $seen = {};
-my $maxdepth = 0;
-my $fakeroot;
-my $subpath;
-my $printfull = 0;
-my $noghosts = 0;
 
 sub _dump {
 	if ($::debug > 1) {
@@ -76,14 +79,14 @@ sub canonpath {
 sub split_path {
 	my $path = canonpath(shift);
 	my @path;
-	for (split(m!\Q$sep\E+!, $path)) {
-		if ($_ eq "")		{ push @path, $sep; }
+	for (split(m!\Q$opt{sep}\E+!, $path)) {
+		if ($_ eq "")		{ push @path, $opt{sep}; }
 		elsif (!@path)		{ push @path, $_; }
 		elsif ($_ eq ".")	{ next; }
 		elsif ($_ eq "..")	{ pop @path; }
 		else			{ push @path, $_; }
 	}
-	return @path ? @path : $sep;
+	return @path ? @path : $opt{sep};
 }
 
 sub walk {
@@ -112,7 +115,7 @@ sub show {
 	my $root = shift // "";
 
 	my @keys = sort keys %$branch;
-	my $shallow = $maxdepth && $depth >= $maxdepth;
+	my $shallow = $opt{maxdepth} && $depth >= $opt{maxdepth};
 
 	$root =~ s!^/+!!;
 
@@ -125,15 +128,15 @@ sub show {
 			$children = deepcount($node);
 		}
 
-		my $path = $root ? $root.$sep.$name : $name;
-		my $exists = $noghosts || exists $seen->{$node};
+		my $path = $root ? $root.$opt{sep}.$name : $name;
+		my $exists = $opt{noghosts} || exists $seen->{$node};
 
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{im} : $GRAPH{ie} : "";
 		print	$GRAPH{ct},
 			"@$graph",
 			$exists ? "" : "[",
 			$exists ? $GRAPH{cr} : $GRAPH{cs},
-			$printfull ? $path : $name,
+			$opt{printfull} ? $path : $name,
 			$GRAPH{ct},
 			$exists ? "" : "]",
 			$::debug ? " <$root>" : "",
@@ -150,21 +153,21 @@ sub show {
 }
 
 GetOptions(
-	"d|max-depth=i" => \$maxdepth,
-	"f|full-names" => \$printfull,
-	"g|no-ghosts" => \$noghosts,
-	"r|fake-root=s" => \$fakeroot,
-	"s|separator=s" => \$sep,
+	"d|max-depth=i" => \$opt{maxdepth},
+	"f|full-names" => \$opt{printfull},
+	"g|no-ghosts" => \$opt{noghosts},
+	"r|fake-root=s" => \$opt{fakeroot},
+	"s|separator=s" => \$opt{sep},
 	map {
-		$_ => sub { $maxdepth = ($maxdepth * 10) + int($_[1]) },
+		$_ => sub { $opt{maxdepth} = ($opt{maxdepth} * 10) + int($_[1]) },
 	} 0..9,
 ) or exit(2);
 
 for (@ARGV) {
 	if (/^@(.+)$/) {
-		$fakeroot = $1;
+		$opt{fakeroot} = $1;
 	} else {
-		$subpath = canonpath($_);
+		$opt{path} = canonpath($_);
 	}
 }
 
@@ -174,22 +177,22 @@ while (<STDIN>) {
 	$seen->{$node} = 1;
 }
 
-while (defined($subpath) && $tree->{"."}) {
+while (defined($opt{path}) && $tree->{"."}) {
 	$tree = $tree->{"."};
 }
 
 my $visible = $tree;
 _dump($visible);
 
-if ($subpath) {
-	_debug("--> descending to '$subpath'");
-	$visible = {$subpath => walk($visible, $subpath)};
+if ($opt{path}) {
+	_debug("--> descending to '$opt{path}'");
+	$visible = {$opt{path} => walk($visible, $opt{path})};
 	_dump($visible);
 }
 
-if (defined $fakeroot) {
-	_debug("<-- prepending fake '$fakeroot'");
-	$visible = {$fakeroot => $visible};
+if (defined $opt{fakeroot}) {
+	_debug("<-- prepending fake '$opt{fakeroot}'");
+	$visible = {$opt{fakeroot} => $visible};
 	_dump($visible);
 }
 

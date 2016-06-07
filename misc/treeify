@@ -8,21 +8,6 @@ use strict;
 use Getopt::Long qw(:config bundling no_ignore_case);
 use File::Spec;
 
-BEGIN {
-	if (eval {require Nullroute::Lib}) {
-		Nullroute::Lib->import(qw(_debug _warn _err _die));
-	} else {
-		$::arg0 = (split m!/!, $0)[-1];
-		$::debug = !!$ENV{DEBUG};
-		$::warnings = 0;
-		$::errors = 0;
-		sub _debug { warn "debug: @_\n" if $ENV{DEBUG}; }
-		sub _warn  { warn "warning: @_\n"; ++$::warnings; }
-		sub _err   { warn "error: @_\n"; ! ++$::errors; }
-		sub _die   { _err(@_); exit 1; }
-	}
-}
-
 my $TERM = (-t 1 ? $ENV{TERM} : undef) // "dumb";
 
 my $TERM256 = $TERM =~ /-256color$/ || $ENV{havecolor} == 256;
@@ -95,7 +80,6 @@ sub split_path {
 sub walk {
 	my ($branch, $path) = @_;
 	my @path = split_path($path);
-	_debug("walking down '$path' <@path>");
 	for (@path) {
 		$branch = $branch->{$_} //= {};
 	}
@@ -188,13 +172,11 @@ my $visible = $tree;
 _dump($visible);
 
 if ($opt{path}) {
-	_debug("--> descending to '$opt{path}'");
 	$visible = {$opt{path} => walk($visible, $opt{path})};
 	_dump($visible);
 }
 
 if (defined $opt{fakeroot}) {
-	_debug("<-- prepending fake '$opt{fakeroot}'");
 	$visible = {$opt{fakeroot} => $visible};
 	_dump($visible);
 }

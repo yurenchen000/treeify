@@ -1,5 +1,8 @@
 #!/usr/bin/env perl
-# display a list of files as a tree
+# treeify - display a list of files as a tree
+# (c) 2013-2016 Mantas Mikulėnas <grawity@gmail.com>
+# Released under the MIT Expat License (dist/LICENSE.expat)
+use v5.10;
 use warnings;
 use strict;
 use Getopt::Long qw(:config bundling no_ignore_case);

@@ -12,10 +12,15 @@ my $TERM = (-t 1 ? $ENV{TERM} : undef) // "dumb";
 my $TERM256 = ($TERM =~ /-256color$/ || $ENV{havecolor} == 256);
 
 my %GRAPH = (
+	# tree
 	sm => "│ ",
 	im => "├─",
 	ie => "└─",
 	se => "  ",
+	# ghost nodes
+	gp => "[",
+	gs => "]",
+	# colors
 	ct => "",
 	cs => "",
 	cr => "",
@@ -117,11 +122,11 @@ sub show {
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{im} : $GRAPH{ie} : "";
 		print	$GRAPH{ct},
 			"@$graph",
-			$exists ? "" : "[",
+			$exists ? "" : $GRAPH{gp},
 			$exists ? $GRAPH{cr} : $GRAPH{cs},
 			$opt{printfull} ? $path : $name,
 			$GRAPH{ct},
-			$exists ? "" : "]",
+			$exists ? "" : $GRAPH{gs},
 			($shallow && $children) ? " ($children)" : "",
 			$GRAPH{cr},
 			"\n";

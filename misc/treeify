@@ -172,7 +172,7 @@ while (<STDIN>) {
 	$seen->{$node} = 1;
 }
 
-while (defined($opt{path}) && $tree->{"."}) {
+while ($opt{path} && $tree->{"."}) {
 	$tree = $tree->{"."};
 }
 
@@ -180,7 +180,7 @@ if ($opt{path}) {
 	$tree = {$opt{path} => walk($tree, $opt{path})};
 }
 
-if (defined $opt{fakeroot}) {
+if ($opt{fakeroot}) {
 	$tree = {$opt{fakeroot} => $tree};
 }
 

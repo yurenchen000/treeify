@@ -131,7 +131,19 @@ sub show {
 	pop @$graph;
 }
 
+sub usage {
+	print "$_\n" for
+	"Usage: treeify [-d DEPTH] [-f] [-g] [-r ROOT] [-s SEP] [PATH]",
+	"",                           #
+	"  -d, --max-depth DEPTH      Limit tree depth",
+	"  -f, --full-names           Show full names of branches and leaves",
+	"  -g, --no-ghosts            Do not highlight 'ghost' branches",
+	"  -r, --fake-root PATH       Add a fake root container",
+	"  -s, --separator SEP        Split paths at SEP instead of '/'",
+}
+
 GetOptions(
+	"help" => sub { usage(); exit; },
 	"d|max-depth=i" => \$opt{maxdepth},
 	"f|full-names" => \$opt{printfull},
 	"g|no-ghosts" => \$opt{noghosts},

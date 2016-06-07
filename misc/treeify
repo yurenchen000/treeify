@@ -140,6 +140,7 @@ sub usage {
 	"  -g, --no-ghosts            Do not highlight 'ghost' branches",
 	"  -r, --fake-root PATH       Add a fake root container",
 	"  -s, --separator SEP        Split paths at SEP instead of '/'",
+	"  PATH                       Only show items under given branch";
 }
 
 GetOptions(

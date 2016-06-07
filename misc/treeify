@@ -9,8 +9,7 @@ use Getopt::Long qw(:config bundling no_ignore_case);
 use File::Spec;
 
 my $TERM = (-t 1 ? $ENV{TERM} : undef) // "dumb";
-
-my $TERM256 = $TERM =~ /-256color$/ || $ENV{havecolor} == 256;
+my $TERM256 = ($TERM =~ /-256color$/ || $ENV{havecolor} == 256);
 
 my %GRAPH = (
 	sm => "│ ",
@@ -45,6 +44,7 @@ my %opt = (
 	sep => "/",
 );
 
+my $node;
 my $tree = {};
 my $seen = {};
 
@@ -89,10 +89,11 @@ sub deepcount {
 }
 
 sub show {
-	my $branch = shift // $tree;
-	my $depth = shift // 0;
-	my $graph = shift // [];
-	my $root = shift // "";
+	my ($branch, $depth, $graph, $root) = @_;
+
+	$depth //= 0;
+	$graph //= [];
+	$root  //= "";
 
 	my @keys = sort keys %$branch;
 	my $shallow = $opt{maxdepth} && $depth >= $opt{maxdepth};
@@ -165,7 +166,7 @@ for (@ARGV) {
 
 while (<STDIN>) {
 	chomp;
-	my $node = walk($tree, $_);
+	$node = walk($tree, $_);
 	$seen->{$node} = 1;
 }
 
@@ -173,14 +174,12 @@ while (defined($opt{path}) && $tree->{"."}) {
 	$tree = $tree->{"."};
 }
 
-my $visible = $tree;
-
 if ($opt{path}) {
-	$visible = {$opt{path} => walk($visible, $opt{path})};
+	$tree = {$opt{path} => walk($tree, $opt{path})};
 }
 
 if (defined $opt{fakeroot}) {
-	$visible = {$opt{fakeroot} => $visible};
+	$tree = {$opt{fakeroot} => $tree};
 }
 
-show($visible);
+show($tree);

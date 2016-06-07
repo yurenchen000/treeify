@@ -8,6 +8,10 @@ use strict;
 use Getopt::Long qw(:config bundling no_ignore_case);
 use File::Spec;
 
+BEGIN {
+	$::debug = !!$ENV{DEBUG};
+}
+
 my $TERM = (-t 1 ? $ENV{TERM} : undef) // "dumb";
 
 my $TERM256 = $TERM =~ /-256color$/ || $ENV{havecolor} == 256;

@@ -8,9 +8,6 @@ use strict;
 use Getopt::Long qw(:config bundling no_ignore_case);
 use File::Spec;
 
-my $TERM = (-t 1 ? $ENV{TERM} : undef) // "dumb";
-my $TERM256 = ($TERM =~ /-256color$/ || $ENV{havecolor} == 256);
-
 my %GRAPH = (
 	# tree
 	sm => "│ ",
@@ -26,21 +23,8 @@ my %GRAPH = (
 	cr => "",
 );
 
-if ($TERM eq "dumb") {
-	$GRAPH{ct} = "";
-	$GRAPH{cs} = "";
-	$GRAPH{cr} = "";
-} elsif ($TERM256) {
-	$GRAPH{ct} = "\e[38;5;59m";
-	$GRAPH{cs} = "\e[38;5;109m";
-	$GRAPH{cr} = "\e[m";
-} else {
-	$GRAPH{ct} = "\e[36m";
-	$GRAPH{cs} = "\e[36m";
-	$GRAPH{cr} = "\e[m";
-}
-
 my %opt = (
+	color => "auto",
 	fakeroot => undef,
 	maxdepth => 0,
 	noghosts => 0,
@@ -150,6 +134,7 @@ sub usage {
 
 GetOptions(
 	"help" => sub { usage(); exit; },
+	"C|color=s" => \$opt{color},
 	"d|max-depth=i" => \$opt{maxdepth},
 	"f|full-names" => \$opt{printfull},
 	"g|no-ghosts" => \$opt{noghosts},
@@ -167,6 +152,35 @@ for (@ARGV) {
 		$opt{path} = canonpath($_);
 	}
 }
+
+# decide on output features
+
+if ($opt{color} eq "auto") {
+	my $term = (-t 1) ? $ENV{TERM} : undef;
+	if (!$term || $term eq "dumb") {
+		$opt{color} = "off";
+	} elsif ($term =~ /-256color$/ || $term =~ /^(xterm|tmux)/) {
+		$opt{color} = "256";
+	} else {
+		$opt{color} = "16";
+	}
+}
+
+if ($opt{color} eq "256") {
+	$GRAPH{ct} = "\e[38;5;59m";
+	$GRAPH{cs} = "\e[38;5;109m";
+	$GRAPH{cr} = "\e[m";
+} elsif ($opt{color} !~ /^(no|off)$/) {
+	$GRAPH{ct} = "\e[36m";
+	$GRAPH{cs} = "\e[36m";
+	$GRAPH{cr} = "\e[m";
+} else {
+	$GRAPH{ct} = "";
+	$GRAPH{cs} = "";
+	$GRAPH{cr} = "";
+}
+
+# parse input
 
 my $node;
 my $tree = {};

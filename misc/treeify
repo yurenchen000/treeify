@@ -49,10 +49,6 @@ my %opt = (
 	sep => "/",
 );
 
-my $node;
-my $tree = {};
-my $seen = {};
-
 sub canonpath {
 	my $path = shift;
 	if ($opt{sep} ne "/") {
@@ -96,7 +92,7 @@ sub deepcount {
 }
 
 sub show {
-	my ($branch, $depth, $graph, $root) = @_;
+	my ($branch, $seen, $depth, $graph, $root) = @_;
 
 	$depth //= 0;
 	$graph //= [];
@@ -134,7 +130,7 @@ sub show {
 		next if $shallow;
 
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{sm} : $GRAPH{se} : "";
-		show($node, $depth+1, $graph, $path);
+		show($node, $seen, $depth+1, $graph, $path);
 	}
 
 	pop @$graph;
@@ -172,6 +168,10 @@ for (@ARGV) {
 	}
 }
 
+my $node;
+my $tree = {};
+my $seen = {};
+
 while (<STDIN>) {
 	chomp;
 	$node = walk($tree, $_);
@@ -190,4 +190,4 @@ if ($opt{fakeroot}) {
 	$tree = {$opt{fakeroot} => $tree};
 }
 
-show($tree);
+show($tree, $seen);

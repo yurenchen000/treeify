@@ -105,8 +105,6 @@ sub show {
 	my @keys = sort keys %$branch;
 	my $shallow = $opt{maxdepth} && $depth >= $opt{maxdepth};
 
-	$root =~ s!^\Q$opt{sep}\E+!!;
-
 	while (@keys) {
 		my $name = shift @keys;
 		my $node = $branch->{$name};
@@ -116,8 +114,11 @@ sub show {
 			$children = deepcount($node);
 		}
 
-		my $path = $root ? $root.$opt{sep}.$name : $name;
-		my $exists = $opt{noghosts} || exists $seen->{$node};
+		my $path = ($root eq $opt{sep}) ? $root.$name
+				: ($root ne "") ? $root.$opt{sep}.$name
+				: $name;
+
+		my $exists = $opt{noghosts} || exists($seen->{$node});
 
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{im} : $GRAPH{ie} : "";
 		print	$GRAPH{ct},

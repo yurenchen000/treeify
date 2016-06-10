@@ -67,7 +67,7 @@ sub canonpath {
 sub split_path {
 	my $path = canonpath(shift);
 	my @path;
-	for (split(m!\Q$opt{sep}\E+!, $path)) {
+	for (split(/\Q$opt{sep}\E+/, $path)) {
 		if ($_ eq "")		{ push @path, $opt{sep}; }
 		elsif (!@path)		{ push @path, $_; }
 		elsif ($_ eq ".")	{ next; }
@@ -131,10 +131,9 @@ sub show {
 			($shallow && $children) ? " ($children)" : "",
 			$GRAPH{cr},
 			"\n";
-		next if $shallow;
-
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{sm} : $GRAPH{se} : "";
-		show($node, $depth+1, $graph, $path);
+
+		show($node, $depth+1, $graph, $path) if !$shallow;
 	}
 
 	pop @$graph;

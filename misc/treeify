@@ -10,17 +10,17 @@ use File::Spec;
 
 my %GRAPH = (
 	# tree
-	sm => "│ ",
-	im => "├─",
-	ie => "└─",
-	se => "  ",
+	s_mid => "│ ",
+	i_mid => "├─",
+	i_end => "└─",
+	s_end => "  ",
 	# ghost nodes
-	gp => "[",
-	gs => "]",
+	ghost_pre => "[",
+	ghost_suf => "]",
 	# colors
-	ct => "",
-	cs => "",
-	cr => "",
+	c_tree => "",
+	c_ghost => "",
+	c_reset => "",
 );
 
 my %opt = (
@@ -100,20 +100,21 @@ sub show {
 
 		my $exists = $opt{noghosts} || exists($seen->{$node});
 
-		$graph->[$depth] = $depth ? @keys ? $GRAPH{im} : $GRAPH{ie} : "";
-		print	$GRAPH{ct},
+		$graph->[$depth] = $depth ? @keys ? $GRAPH{i_mid} : $GRAPH{i_end} : "";
+		print	$GRAPH{c_tree},
 			"@$graph",
-			$exists ? "" : $GRAPH{gp},
-			$exists ? $GRAPH{cr} : $GRAPH{cs},
+			$exists ? "" : $GRAPH{ghost_pre},
+			$GRAPH{c_reset},
+			$exists ? "" : $GRAPH{c_ghost},
 			$opt{printfull} ? $path : $name,
-			$GRAPH{ct},
-			$exists ? "" : $GRAPH{gs},
+			$GRAPH{c_tree},
+			$exists ? "" : $GRAPH{ghost_suf},
 			($shallow && $children) ? " ($children)" : "",
-			$GRAPH{cr},
+			$GRAPH{c_reset},
 			"\n";
 		next if $shallow;
 
-		$graph->[$depth] = $depth ? @keys ? $GRAPH{sm} : $GRAPH{se} : "";
+		$graph->[$depth] = $depth ? @keys ? $GRAPH{s_mid} : $GRAPH{s_end} : "";
 		show($node, $seen, $depth+1, $graph, $path);
 	}
 
@@ -167,17 +168,13 @@ if ($opt{color} eq "auto") {
 }
 
 if ($opt{color} eq "256") {
-	$GRAPH{ct} = "\e[38;5;59m";
-	$GRAPH{cs} = "\e[38;5;109m";
-	$GRAPH{cr} = "\e[m";
+	$GRAPH{c_tree} = "\e[38;5;59m";
+	$GRAPH{c_ghost} = "\e[38;5;109m";
+	$GRAPH{c_reset} = "\e[m";
 } elsif ($opt{color} !~ /^(no|off)$/) {
-	$GRAPH{ct} = "\e[36m";
-	$GRAPH{cs} = "\e[36m";
-	$GRAPH{cr} = "\e[m";
-} else {
-	$GRAPH{ct} = "";
-	$GRAPH{cs} = "";
-	$GRAPH{cr} = "";
+	$GRAPH{c_tree} = "\e[36m";
+	$GRAPH{c_ghost} = "\e[36m";
+	$GRAPH{c_reset} = "\e[m";
 }
 
 # parse input

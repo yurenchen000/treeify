@@ -30,6 +30,7 @@ my %opt = (
 	noghosts => 0,
 	path => undef,
 	printfull => 0,
+	reverse => 0,
 	sep => "/",
 );
 
@@ -47,12 +48,15 @@ sub canonpath {
 sub split_path {
 	my $path = canonpath(shift);
 	my @path;
-	for (split(m!\Q$opt{sep}\E+!, $path)) {
+	for (split(/\Q$opt{sep}\E+/, $path)) {
 		if ($_ eq "")		{ push @path, $opt{sep}; }
 		elsif (!@path)		{ push @path, $_; }
 		elsif ($_ eq ".")	{ next; }
 		elsif ($_ eq "..")	{ pop @path; }
 		else			{ push @path, $_; }
+	}
+	if ($opt{reverse}) {
+		@path = reverse @path;
 	}
 	return @path ? @path : $opt{sep};
 }
@@ -94,9 +98,18 @@ sub show {
 			$children = deepcount($node);
 		}
 
-		my $path = ($root eq $opt{sep}) ? $root.$name
-				: ($root ne "") ? $root.$opt{sep}.$name
-				: $name;
+		my $path;
+		if ($root eq $opt{sep}) {
+			$path = $opt{reverse}
+				? $name.$root
+				: $root.$name;
+		} elsif ($root ne "") {
+			$path = $opt{reverse}
+				? $name.$opt{sep}.$root
+				: $root.$opt{sep}.$name;
+		} else {
+			$path = $name;
+		}
 
 		my $exists = $opt{noghosts} || exists($seen->{$node});
 
@@ -112,10 +125,9 @@ sub show {
 			($shallow && $children) ? " ($children)" : "",
 			$GRAPH{c_reset},
 			"\n";
-		next if $shallow;
-
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{s_mid} : $GRAPH{s_end} : "";
-		show($node, $seen, $depth+1, $graph, $path);
+
+		show($node, $seen, $depth+1, $graph, $path) if !$shallow;
 	}
 
 	pop @$graph;
@@ -123,12 +135,13 @@ sub show {
 
 sub usage {
 	print "$_\n" for
-	"Usage: treeify [-d DEPTH] [-f] [-g] [-r ROOT] [-s SEP] [PATH]",
+	"Usage: treeify [-d DEPTH] [-f] [-g] [-r ROOT] [-R] [-s SEP] [PATH]",
 	"",                           #
 	"  -d, --max-depth DEPTH      Limit tree depth",
 	"  -f, --full-names           Show full names of branches and leaves",
 	"  -g, --no-ghosts            Do not highlight 'ghost' branches",
 	"  -r, --fake-root PATH       Add a fake root container",
+	"  -R, --reverse              Process paths in reverse (for DNS domains)",
 	"  -s, --separator SEP        Split paths at SEP instead of '/'",
 	"  PATH                       Only show items under given branch";
 }
@@ -140,6 +153,7 @@ GetOptions(
 	"f|full-names" => \$opt{printfull},
 	"g|no-ghosts" => \$opt{noghosts},
 	"r|fake-root=s" => \$opt{fakeroot},
+	"R|reverse" => \$opt{reverse},
 	"s|separator=s" => \$opt{sep},
 	map {
 		$_ => sub { $opt{maxdepth} = ($opt{maxdepth} * 10) + int($_[0]) },

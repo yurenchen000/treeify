@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # treeify - display a list of files as a tree
 # (c) 2013-2016 Mantas Mikulėnas <grawity@gmail.com>
-# Released under the MIT Expat License (dist/LICENSE.expat)
+# Released under the MIT License (dist/LICENSE.mit)
 use v5.10;
 use warnings;
 use strict;

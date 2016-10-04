@@ -87,7 +87,7 @@ sub show {
 	$root  //= "";
 
 	my @keys = sort keys %$branch;
-	if (require Sort::Naturally) {
+	if (eval {require Sort::Naturally}) {
 		@keys = Sort::Naturally::nsort(@keys);
 	}
 	my $shallow = $opt{maxdepth} && $depth >= $opt{maxdepth};

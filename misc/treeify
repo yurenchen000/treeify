@@ -91,6 +91,7 @@ sub show {
 		@keys = Sort::Naturally::nsort(@keys);
 	}
 	my $shallow = $opt{maxdepth} && $depth >= $opt{maxdepth};
+	my $frdepth = defined($opt{fakeroot}) ? (2 - $opt{printfull}) : 0;
 
 	while (@keys) {
 		my $name = shift @keys;
@@ -106,7 +107,7 @@ sub show {
 			$path = $opt{reverse}
 				? $name.$root
 				: $root.$name;
-		} elsif ($root ne "") {
+		} elsif ($depth > $frdepth) {
 			$path = $opt{reverse}
 				? $name.$opt{sep}.$root
 				: $root.$opt{sep}.$name;
@@ -153,7 +154,7 @@ GetOptions(
 	"help" => sub { usage(); exit; },
 	"C|color=s" => \$opt{color},
 	"d|max-depth=i" => \$opt{maxdepth},
-	"f|full-names" => \$opt{printfull},
+	"f|full-names+" => \$opt{printfull},
 	"g|no-ghosts" => \$opt{noghosts},
 	"r|fake-root=s" => \$opt{fakeroot},
 	"R|reverse" => \$opt{reverse},

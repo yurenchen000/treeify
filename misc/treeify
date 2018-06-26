@@ -216,6 +216,9 @@ if ($opt{path}) {
 }
 
 if ($opt{fakeroot}) {
+	while ($tree->{"/"}) {
+		$tree = $tree->{"/"}
+	}
 	$tree = {$opt{fakeroot} => $tree};
 }
 

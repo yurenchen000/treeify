@@ -14,6 +14,9 @@ my %GRAPH = (
 	i_mid => "├─",
 	i_end => "└─",
 	s_end => "  ",
+	# branch
+	br_cont => "┬ ",
+	br_leaf => "─ ",
 	# ghost nodes
 	ghost_pre => "[",
 	ghost_suf => "]",
@@ -95,6 +98,7 @@ sub show {
 	my $frdepth = defined($opt{fakeroot}) ? (2 - $opt{printfull}) : 0;
 
 	my $compact = $opt{style} eq "compact";
+	my $sideways = $opt{style} eq "sideways";
 
 	while (@keys) {
 		my $name = shift @keys;
@@ -122,7 +126,12 @@ sub show {
 
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{i_mid} : $GRAPH{i_end} : "";
 		print	$GRAPH{c_tree},
-			join($compact ? "" : " ", @$graph),
+			join($compact || $sideways ? "" : " ", @$graph),
+			$sideways
+				? $depth
+					? $children ? $GRAPH{br_cont} : $GRAPH{br_leaf}
+					: ""
+				: (),
 			$exists ? "" : $GRAPH{ghost_pre},
 			$GRAPH{c_reset},
 			$exists ? "" : $GRAPH{c_ghost},

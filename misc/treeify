@@ -119,7 +119,7 @@ sub show {
 
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{i_mid} : $GRAPH{i_end} : "";
 		print	$GRAPH{c_tree},
-			"@$graph",
+			join(" ", @$graph),
 			$exists ? "" : $GRAPH{ghost_pre},
 			$GRAPH{c_reset},
 			$exists ? "" : $GRAPH{c_ghost},

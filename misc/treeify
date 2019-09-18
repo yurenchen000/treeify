@@ -24,6 +24,7 @@ my %GRAPH = (
 );
 
 my %opt = (
+	style => "normal",
 	color => "auto",
 	fakeroot => undef,
 	maxdepth => 0,
@@ -93,6 +94,8 @@ sub show {
 	my $shallow = $opt{maxdepth} && $depth >= $opt{maxdepth};
 	my $frdepth = defined($opt{fakeroot}) ? (2 - $opt{printfull}) : 0;
 
+	my $compact = $opt{style} eq "compact";
+
 	while (@keys) {
 		my $name = shift @keys;
 		my $node = $branch->{$name};
@@ -119,7 +122,7 @@ sub show {
 
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{i_mid} : $GRAPH{i_end} : "";
 		print	$GRAPH{c_tree},
-			join(" ", @$graph),
+			join($compact ? "" : " ", @$graph),
 			$exists ? "" : $GRAPH{ghost_pre},
 			$GRAPH{c_reset},
 			$exists ? "" : $GRAPH{c_ghost},
@@ -159,6 +162,7 @@ GetOptions(
 	"r|fake-root=s" => \$opt{fakeroot},
 	"R|reverse" => \$opt{reverse},
 	"s|separator=s" => \$opt{sep},
+	"y|style=s" => \$opt{style},
 	map {
 		$_ => sub { $opt{maxdepth} = ($opt{maxdepth} * 10) + int($_[0]) },
 	} 0..9,

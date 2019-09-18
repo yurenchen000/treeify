@@ -125,13 +125,11 @@ sub show {
 		my $exists = $opt{noghosts} || exists($seen->{$node});
 
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{i_mid} : $GRAPH{i_end} : "";
+
 		print	$GRAPH{c_tree},
+			$sideways ? $depth ? " " : "─" : "",
 			join($compact || $sideways ? "" : " ", @$graph),
-			$sideways
-				? $depth
-					? $children ? $GRAPH{br_cont} : $GRAPH{br_leaf}
-					: ""
-				: (),
+			$sideways ? $children ? $GRAPH{br_cont} : $GRAPH{br_leaf} : "",
 			$exists ? "" : $GRAPH{ghost_pre},
 			$GRAPH{c_reset},
 			$exists ? "" : $GRAPH{c_ghost},
@@ -141,6 +139,7 @@ sub show {
 			($shallow && $children) ? " ($children)" : "",
 			$GRAPH{c_reset},
 			"\n";
+
 		$graph->[$depth] = $depth ? @keys ? $GRAPH{s_mid} : $GRAPH{s_end} : "";
 
 		show($node, $seen, $depth+1, $graph, $path) if !$shallow;

@@ -97,7 +97,7 @@ sub show {
 	my ($branch, $seen, $depth, $graph, $root) = @_;
 
 	$depth //= 0;
-	$graph //= [];
+	$graph //= [""];
 	$root //= "";
 
 	my @keys = sort keys %$branch;
@@ -113,9 +113,17 @@ sub show {
 	# Whether to show compact or full-length branches
 	my $bcompact = ($compact && $sideways);
 
+	# Child tree indent level
+	my $sub_indent = ($compact || $sideways) ? 0 : 1;
+	# Rightwards branch length
+	my $branch_pad = ($bcompact) ? 0 : 1;
+	# Space between branch and label
+	my $name_pad = ($sideways && !$compact) ? 1 : 0;
+
 	while (@keys) {
 		my $name = shift @keys;
 		my $node = $branch->{$name};
+		my $exists = $opt{noghosts} || exists($seen->{$node});
 
 		my $children = keys %$node;
 		if ($shallow && $children) {
@@ -135,15 +143,29 @@ sub show {
 			$path = $name;
 		}
 
-		my $exists = $opt{noghosts} || exists($seen->{$node});
+		if ($depth > 0) {
+			$graph->[$depth] = (@keys ? $GRAPH{i_mid} : $GRAPH{i_end}).($GRAPH{i_br} x $branch_pad);
+		} elsif ($sideways) {
+			# For sideways graphs (where subtrees descend directly
+			# from the branch, rather than from the name), even the
+			# root has a branch, therefore needs padding.
+			$graph->[$depth] = ($GRAPH{i_br} x $branch_pad);
+		}
 
-		$graph->[$depth] = $depth ? (@keys ? $GRAPH{i_mid} : $GRAPH{i_end}).(!$bcompact ? $GRAPH{i_br} : "") : "";
+		my $tree_str = join(" " x $sub_indent, @$graph);
+		if ($sideways) {
+			$tree_str .= ($children ? $GRAPH{br_cont} : $GRAPH{br_leaf});
+		}
+
+		if ($depth > 0) {
+			$graph->[$depth] = (@keys ? $GRAPH{s_mid} : $GRAPH{s_end}).($GRAPH{s_br} x $branch_pad);
+		} elsif ($sideways) {
+			$graph->[$depth] = ($GRAPH{s_br} x $branch_pad);
+		}
 
 		print	$GRAPH{c_tree},
-			$sideways ? ($depth ? " " : "─") : "",
-			join(($compact || $sideways) ? "" : " ", @$graph),
-			$sideways ? ($children ? $GRAPH{br_cont} : $GRAPH{br_leaf}) : "",
-			$sideways ? (!$compact ? " " : "") : "",
+			$tree_str,
+			" " x $name_pad,
 			$exists ? "" : $GRAPH{ghost_pre},
 			$GRAPH{c_reset},
 			$exists ? "" : $GRAPH{c_ghost},
@@ -153,8 +175,6 @@ sub show {
 			($shallow && $children) ? " ($children)" : "",
 			$GRAPH{c_reset},
 			"\n";
-
-		$graph->[$depth] = $depth ? (@keys ? $GRAPH{s_mid} : $GRAPH{s_end}).(!$bcompact ? $GRAPH{s_br} : "") : "";
 
 		show($node, $seen, $depth+1, $graph, $path) if !$shallow;
 	}

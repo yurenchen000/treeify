@@ -67,9 +67,16 @@ sub split_path {
 
 sub walk {
 	my ($branch, $path) = @_;
-	my @path = split_path($path);
-	for (@path) {
+	for (split_path($path)) {
 		$branch = $branch->{$_} //= {};
+	}
+	return $branch;
+}
+
+sub crawl {
+	my ($branch, $child) = @_;
+	while ($branch->{$child}) {
+		$branch = $branch->{$child};
 	}
 	return $branch;
 }
@@ -88,7 +95,7 @@ sub show {
 
 	$depth //= 0;
 	$graph //= [];
-	$root  //= "";
+	$root //= "";
 
 	my @keys = sort keys %$branch;
 	if (eval {require Sort::Naturally}) {
@@ -214,24 +221,25 @@ my $node;
 my $tree = {};
 my $seen = {};
 
+# Parse input
 while (<STDIN>) {
 	chomp;
-	$node = walk($tree, $_);
-	$seen->{$node} = 1;
+	$seen->{walk($tree, $_)} = 1;
 }
 
-while ($opt{path} && $tree->{"."}) {
-	$tree = $tree->{"."};
-}
-
+# Descend into specified path
 if ($opt{path}) {
+	# Discard any "./" prefix, so that 'find | treeify foo' would Do What
+	# You Mean and correctly descend into "./foo".
+	$tree = crawl($tree, ".");
 	$tree = {$opt{path} => walk($tree, $opt{path})};
 }
 
+# Prefix with fake root node
 if ($opt{fakeroot}) {
-	while ($tree->{"/"}) {
-		$tree = $tree->{"/"}
-	}
+	# If the input starts at "/", we want to throw that away when showing a
+	# custom root prefix.
+	$tree = crawl($tree, "/");
 	$tree = {$opt{fakeroot} => $tree};
 }
 

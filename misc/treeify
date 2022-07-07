@@ -10,13 +10,16 @@ use File::Spec;
 
 my %GRAPH = (
 	# tree
-	s_mid => "│ ",
-	i_mid => "├─",
-	i_end => "└─",
-	s_end => "  ",
-	# branch
-	br_cont => "┬ ",
-	br_leaf => "─ ",
+	s_mid => "│",
+	i_mid => "├",
+	i_end => "└",
+	s_end => " ",
+	# tree branch extension/padding
+	i_br => "─",
+	s_br => " ",
+	# sideways branch
+	br_cont => "┬",
+	br_leaf => "─",
 	# ghost nodes
 	ghost_pre => "[",
 	ghost_suf => "]",
@@ -104,8 +107,11 @@ sub show {
 	my $shallow = $opt{maxdepth} && $depth >= $opt{maxdepth};
 	my $frdepth = defined($opt{fakeroot}) ? (2 - $opt{printfull}) : 0;
 
-	my $compact = $opt{style} eq "compact";
-	my $sideways = $opt{style} eq "sideways";
+	# Whether to indent child subtrees by 1
+	my $compact = $opt{style} eq "compact" || $opt{style} eq "sideways-compact";
+	my $sideways = $opt{style} eq "sideways" || $opt{style} eq "sideways-compact";
+	# Whether to show compact or full-length branches
+	my $bcompact = ($compact && $sideways);
 
 	while (@keys) {
 		my $name = shift @keys;
@@ -131,12 +137,13 @@ sub show {
 
 		my $exists = $opt{noghosts} || exists($seen->{$node});
 
-		$graph->[$depth] = $depth ? @keys ? $GRAPH{i_mid} : $GRAPH{i_end} : "";
+		$graph->[$depth] = $depth ? (@keys ? $GRAPH{i_mid} : $GRAPH{i_end}).(!$bcompact ? $GRAPH{i_br} : "") : "";
 
 		print	$GRAPH{c_tree},
-			$sideways ? $depth ? " " : "─" : "",
-			join($compact || $sideways ? "" : " ", @$graph),
-			$sideways ? $children ? $GRAPH{br_cont} : $GRAPH{br_leaf} : "",
+			$sideways ? ($depth ? " " : "─") : "",
+			join(($compact || $sideways) ? "" : " ", @$graph),
+			$sideways ? ($children ? $GRAPH{br_cont} : $GRAPH{br_leaf}) : "",
+			$sideways ? (!$compact ? " " : "") : "",
 			$exists ? "" : $GRAPH{ghost_pre},
 			$GRAPH{c_reset},
 			$exists ? "" : $GRAPH{c_ghost},
@@ -147,7 +154,7 @@ sub show {
 			$GRAPH{c_reset},
 			"\n";
 
-		$graph->[$depth] = $depth ? @keys ? $GRAPH{s_mid} : $GRAPH{s_end} : "";
+		$graph->[$depth] = $depth ? (@keys ? $GRAPH{s_mid} : $GRAPH{s_end}).(!$bcompact ? $GRAPH{s_br} : "") : "";
 
 		show($node, $seen, $depth+1, $graph, $path) if !$shallow;
 	}

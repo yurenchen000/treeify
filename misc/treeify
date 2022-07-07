@@ -139,17 +139,17 @@ sub show {
 			$children = deepcount($node);
 		}
 
-		my $path;
-		if ($root eq $opt{sep}) {
-			$path = $opt{reverse}
-				? $name.$root
-				: $root.$name;
-		} elsif ($depth > $frdepth) {
-			$path = $opt{reverse}
-				? $name.$opt{sep}.$root
-				: $root.$opt{sep}.$name;
-		} else {
-			$path = $name;
+		if ($opt{printfull}) {
+			# Display full path of the current node
+			if ($root eq $opt{sep}) {
+				$name = $opt{reverse}
+					? $name.$root
+					: $root.$name;
+			} elsif ($depth > $frdepth) {
+				$name = $opt{reverse}
+					? $name.$opt{sep}.$root
+					: $root.$opt{sep}.$name;
+			}
 		}
 
 		if ($depth > 0) {
@@ -176,10 +176,10 @@ sub show {
 		$line_str .= color("c_tree", $tree_str);
 		$line_str .= " " x $name_pad;
 		if ($exists) {
-			$line_str .= $opt{printfull} ? $path : $name;
+			$line_str .= $name;
 		} else {
 			$line_str .= color("c_tree", $GRAPH{ghost_pre});
-			$line_str .= color("c_ghost", $opt{printfull} ? $path : $name);
+			$line_str .= color("c_ghost", $name);
 			$line_str .= color("c_tree", $GRAPH{ghost_suf});
 		}
 		if ($shallow && $children) {
@@ -187,7 +187,7 @@ sub show {
 		}
 		print "$line_str\n";
 
-		show($node, $seen, $depth+1, $graph, $path) if !$shallow;
+		show($node, $seen, $depth+1, $graph, $name) if !$shallow;
 	}
 
 	pop @$graph;

@@ -41,6 +41,15 @@ my %opt = (
 	sep => "/",
 );
 
+sub color {
+	my ($color, $str) = @_;
+	if ($color && $GRAPH{$color}) {
+		return $GRAPH{$color}.$str.$GRAPH{c_reset};
+	} else {
+		return $str;
+	}
+}
+
 sub canonpath {
 	my $path = shift;
 	if ($opt{sep} ne "/") {
@@ -163,18 +172,20 @@ sub show {
 			$graph->[$depth] = ($GRAPH{s_br} x $branch_pad);
 		}
 
-		print	$GRAPH{c_tree},
-			$tree_str,
-			" " x $name_pad,
-			$exists ? "" : $GRAPH{ghost_pre},
-			$GRAPH{c_reset},
-			$exists ? "" : $GRAPH{c_ghost},
-			$opt{printfull} ? $path : $name,
-			$GRAPH{c_tree},
-			$exists ? "" : $GRAPH{ghost_suf},
-			($shallow && $children) ? " ($children)" : "",
-			$GRAPH{c_reset},
-			"\n";
+		my $line_str;
+		$line_str .= color("c_tree", $tree_str);
+		$line_str .= " " x $name_pad;
+		if ($exists) {
+			$line_str .= $opt{printfull} ? $path : $name;
+		} else {
+			$line_str .= color("c_tree", $GRAPH{ghost_pre});
+			$line_str .= color("c_ghost", $opt{printfull} ? $path : $name);
+			$line_str .= color("c_tree", $GRAPH{ghost_suf});
+		}
+		if ($shallow && $children) {
+			$line_str .= color("c_tree", " ($children)");
+		}
+		print "$line_str\n";
 
 		show($node, $seen, $depth+1, $graph, $path) if !$shallow;
 	}

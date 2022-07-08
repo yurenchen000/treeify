@@ -5,12 +5,9 @@
 use v5.10;
 use warnings;
 use strict;
-use Getopt::Long qw(:config bundling no_ignore_case);
+use constant { true => 1, false => 0 };
 use File::Spec;
-use constant {
-	true => 1,
-	false => 0,
-};
+use Getopt::Long qw(:config bundling no_ignore_case);
 
 my %GRAPH = (
 	# tree
@@ -57,7 +54,7 @@ sub color {
 }
 
 sub canonpath {
-	my $path = shift;
+	my ($path) = @_;
 	if ($opt{separator} ne "/") {
 		return $path;
 	} elsif ($path =~ m|^(\./)|) {
@@ -68,7 +65,8 @@ sub canonpath {
 }
 
 sub split_path {
-	my $path = canonpath(shift);
+	my ($path) = @_;
+	$path = canonpath($path);
 	my @path;
 	for (split(/\Q$opt{separator}\E+/, $path)) {
 		if ($_ eq "")		{ push @path, $opt{separator}; }

@@ -36,13 +36,13 @@ my %GRAPH = (
 my %opt = (
 	style => "normal",
 	color => "auto",
-	fakeroot => undef,
-	maxdepth => 0,
-	noghosts => 0,
+	fake_root => undef,
+	max_depth => 0,
+	no_ghosts => 0,
 	path => undef,
-	printfull => 0,
+	print_full => 0,
 	reverse => 0,
-	sep => "/",
+	separator => "/",
 );
 
 sub color {
@@ -56,7 +56,7 @@ sub color {
 
 sub canonpath {
 	my $path = shift;
-	if ($opt{sep} ne "/") {
+	if ($opt{separator} ne "/") {
 		return $path;
 	} elsif ($path =~ m|^(\./)|) {
 		return $1 . File::Spec->canonpath($path);
@@ -68,8 +68,8 @@ sub canonpath {
 sub split_path {
 	my $path = canonpath(shift);
 	my @path;
-	for (split(/\Q$opt{sep}\E+/, $path)) {
-		if ($_ eq "")		{ push @path, $opt{sep}; }
+	for (split(/\Q$opt{separator}\E+/, $path)) {
+		if ($_ eq "")		{ push @path, $opt{separator}; }
 		elsif (!@path)		{ push @path, $_; }
 		elsif ($_ eq ".")	{ next; }
 		elsif ($_ eq "..")	{ pop @path; }
@@ -78,7 +78,7 @@ sub split_path {
 	if ($opt{reverse}) {
 		@path = reverse @path;
 	}
-	return @path ? @path : $opt{sep};
+	return @path ? @path : $opt{separator};
 }
 
 sub walk {
@@ -113,8 +113,8 @@ sub show {
 	$graph //= [""];
 	$root //= "";
 
-	my $shallow = $opt{maxdepth} && $depth >= $opt{maxdepth};
-	my $frdepth = defined($opt{fakeroot}) ? (2 - $opt{printfull}) : 0;
+	my $shallow = $opt{max_depth} && $depth >= $opt{max_depth};
+	my $frdepth = defined($opt{fake_root}) ? (2 - $opt{print_full}) : 0;
 
 	# Child tree indent level
 	my $sub_indent = $opt{sub_indent} // 1;
@@ -134,23 +134,23 @@ sub show {
 	while (@keys) {
 		my $name = shift @keys;
 		my $node = $branch->{$name};
-		my $exists = $opt{noghosts} || exists($seen->{$node});
+		my $exists = $opt{no_ghosts} || exists($seen->{$node});
 
 		my $children = keys %$node;
 		if ($shallow && $children) {
 			$children = deepcount($node);
 		}
 
-		if ($opt{printfull}) {
+		if ($opt{print_full}) {
 			# Display full path of the current node
-			if ($root eq $opt{sep}) {
+			if ($root eq $opt{separator}) {
 				$name = $opt{reverse}
 					? $name.$root
 					: $root.$name;
 			} elsif ($depth > $frdepth) {
 				$name = $opt{reverse}
-					? $name.$opt{sep}.$root
-					: $root.$opt{sep}.$name;
+					? $name.$opt{separator}.$root
+					: $root.$opt{separator}.$name;
 			}
 		}
 
@@ -212,21 +212,22 @@ sub usage {
 GetOptions(
 	"help" => sub { usage(); exit; },
 	"C|color=s" => \$opt{color},
-	"d|max-depth=i" => \$opt{maxdepth},
-	"f|full-names+" => \$opt{printfull},
-	"g|no-ghosts" => \$opt{noghosts},
-	"r|fake-root=s" => \$opt{fakeroot},
+	"d|max-depth=i" => \$opt{max_depth},
+	"f|full-names+" => \$opt{print_full},
+	"g|no-ghosts" => \$opt{no_ghosts},
+	"r|fake-root=s" => \$opt{fake_root},
 	"R|reverse" => \$opt{reverse},
 	"s|separator=s" => \$opt{sep},
 	"y|style=s" => \$opt{style},
+	# Handle oldstyle digit options such as '-10'
 	map {
-		$_ => sub { $opt{maxdepth} = ($opt{maxdepth} * 10) + int($_[0]) },
+		$_ => sub { $opt{max_depth} = ($opt{max_depth} * 10) + int($_[0]) },
 	} 0..9,
 ) or exit(2);
 
 for (@ARGV) {
 	if (/^@(.+)$/) {
-		$opt{fakeroot} = $1;
+		$opt{fake_root} = $1;
 	} else {
 		$opt{path} = canonpath($_);
 	}
@@ -300,11 +301,11 @@ if ($opt{path}) {
 }
 
 # Prefix with fake root node
-if ($opt{fakeroot}) {
+if ($opt{fake_root}) {
 	# If the input starts at "/", we want to throw that away when showing a
 	# custom root prefix.
 	$tree = crawl($tree, "/");
-	$tree = {$opt{fakeroot} => $tree};
+	$tree = {$opt{fake_root} => $tree};
 }
 
 show($tree, $seen);

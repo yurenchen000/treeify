@@ -125,9 +125,8 @@ sub show {
 	my $name_pad = $opt{name_pad} // 0;
 	# Whether we have reached maximum allowed depth (don't descend, just show count)
 	my $at_max_depth = ($opt{max_depth} && $depth >= $opt{max_depth});
-
-	# I don't remember??
-	my $frdepth = defined($opt{fake_root}) ? (2 - $opt{print_full}) : 0;
+	# If a fake root is shown, do not prefix it to paths (skip 1st level).
+	my $skip_path_levels = defined($opt{fake_root}) ? 1 : 0;
 
 	my @keys = keys %$branch;
 	if (eval {require Sort::Naturally}) {
@@ -151,7 +150,7 @@ sub show {
 				$name = $opt{reverse}
 					? $name.$root
 					: $root.$name;
-			} elsif ($depth > $frdepth) {
+			} elsif ($depth > $skip_path_levels) {
 				$name = $opt{reverse}
 					? $name.$opt{separator}.$root
 					: $root.$opt{separator}.$name;

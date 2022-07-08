@@ -208,7 +208,7 @@ sub usage {
 	"  -r, --fake-root PATH       Prefix with a fake root container",
 	"  -R, --reverse              Process paths in reverse (for DNS domains)",
 	"  -s, --separator SEP        Split paths at SEP instead of '/'",
-	"  -y, --style STYLE          Change appearance (normal, compact, sideways)",
+	"  -y, --style STYLE          Change appearance (pass 'help' for options)",
 	"  PATH                       Only show items under given branch";
 }
 
@@ -258,6 +258,17 @@ if ($opt{style} eq "normal") {
 	$opt{sub_indent} = 0;
 	$opt{branch_pad} = 0;
 	$opt{name_pad} = 0;
+} elsif ($opt{style} eq "help") {
+	warn "Supported styles:\n";
+	warn "  - $_\n" for qw(
+		normal
+		compact
+		vcompact
+		sideways
+		sideways-compact
+		sideways-vcompact
+	);
+	exit(1);
 } else {
 	die "error: Unknown style '$opt{style}'\n";
 }

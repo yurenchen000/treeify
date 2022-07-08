@@ -115,9 +115,6 @@ sub show {
 	$graph //= [""];
 	$root //= "";
 
-	my $shallow = $opt{max_depth} && $depth >= $opt{max_depth};
-	my $frdepth = defined($opt{fake_root}) ? (2 - $opt{print_full}) : 0;
-
 	# Child tree indent level
 	my $sub_indent = $opt{sub_indent} // 1;
 	# Rightwards branch length
@@ -126,6 +123,11 @@ sub show {
 	my $sideways = $opt{sideways} // false;
 	# Space between branch and label (currently sideways-only)
 	my $name_pad = $opt{name_pad} // 0;
+	# Whether we have reached maximum allowed depth (don't descend, just show count)
+	my $at_max_depth = ($opt{max_depth} && $depth >= $opt{max_depth});
+
+	# I don't remember??
+	my $frdepth = defined($opt{fake_root}) ? (2 - $opt{print_full}) : 0;
 
 	my @keys = keys %$branch;
 	if (eval {require Sort::Naturally}) {
@@ -138,9 +140,9 @@ sub show {
 		my $node = $branch->{$name};
 		my $exists = $opt{no_ghosts} || exists($seen->{$node});
 
-		my $children = keys %$node;
-		if ($shallow && $children) {
-			$children = deepcount($node);
+		my $n_children = keys %$node;
+		if ($at_max_depth && $n_children) {
+			$n_children = deepcount($node);
 		}
 
 		if ($opt{print_full}) {
@@ -167,7 +169,7 @@ sub show {
 
 		my $tree_str = join(" " x $sub_indent, @$graph);
 		if ($sideways) {
-			$tree_str .= ($children ? $GRAPH{br_cont} : $GRAPH{br_leaf});
+			$tree_str .= ($n_children ? $GRAPH{br_cont} : $GRAPH{br_leaf});
 		}
 
 		if ($depth > 0) {
@@ -186,12 +188,12 @@ sub show {
 			$line_str .= color("ghost", $name);
 			$line_str .= color("tree", $GRAPH{ghost_suf});
 		}
-		if ($shallow && $children) {
-			$line_str .= color("tree", " ($children)");
+		if ($at_max_depth && $n_children) {
+			$line_str .= color("tree", " ($n_children)");
 		}
 		print "$line_str\n";
 
-		show($node, $seen, $depth+1, $graph, $name) if !$shallow;
+		show($node, $seen, $depth+1, $graph, $name) if !$at_max_depth;
 	}
 
 	pop @$graph;

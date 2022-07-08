@@ -125,7 +125,9 @@ sub show {
 	# Space between branch and label (currently sideways-only)
 	my $name_pad = 0;
 
-	if ($opt{style} eq "compact") {
+	if ($opt{style} eq "normal") {
+		1;
+	} elsif ($opt{style} eq "compact") {
 		$sub_indent = 0;
 	} elsif ($opt{style} eq "vcompact") {
 		$sub_indent = 0;

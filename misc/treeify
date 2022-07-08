@@ -109,11 +109,11 @@ sub deepcount {
 }
 
 sub show {
-	my ($branch, $seen, $depth, $graph, $root) = @_;
+	my ($branch, $seen, $depth, $graph, $path) = @_;
 
 	$depth //= 0;
 	$graph //= [""];
-	$root //= "";
+	$path //= "";
 
 	# Child tree indent level
 	my $sub_indent = $opt{sub_indent} // 1;
@@ -146,14 +146,14 @@ sub show {
 
 		if ($opt{print_full}) {
 			# Display full path of the current node
-			if ($root eq $opt{separator}) {
+			if ($path eq $opt{separator}) {
 				$name = $opt{reverse}
-					? $name.$root
-					: $root.$name;
+					? $name.$path
+					: $path.$name;
 			} elsif ($depth > $skip_path_levels) {
 				$name = $opt{reverse}
-					? $name.$opt{separator}.$root
-					: $root.$opt{separator}.$name;
+					? $name.$opt{separator}.$path
+					: $path.$opt{separator}.$name;
 			}
 		}
 

@@ -27,10 +27,12 @@ my %GRAPH = (
 	# ghost nodes
 	ghost_pre => "[",
 	ghost_suf => "]",
-	# colors
-	c_tree => "",
-	c_ghost => "",
-	c_reset => "",
+);
+
+my %COLOR = (
+	tree => "",
+	ghost => "",
+	reset => "",
 );
 
 my %opt = (
@@ -47,8 +49,8 @@ my %opt = (
 
 sub color {
 	my ($color, $str) = @_;
-	if ($color && $GRAPH{$color}) {
-		return $GRAPH{$color}.$str.$GRAPH{c_reset};
+	if ($color && $COLOR{$color}) {
+		return $COLOR{$color}.$str.$COLOR{"reset"};
 	} else {
 		return $str;
 	}
@@ -175,17 +177,17 @@ sub show {
 		}
 
 		my $line_str;
-		$line_str .= color("c_tree", $tree_str);
+		$line_str .= color("tree", $tree_str);
 		$line_str .= " " x $name_pad;
 		if ($exists) {
 			$line_str .= $name;
 		} else {
-			$line_str .= color("c_tree", $GRAPH{ghost_pre});
-			$line_str .= color("c_ghost", $name);
-			$line_str .= color("c_tree", $GRAPH{ghost_suf});
+			$line_str .= color("tree", $GRAPH{ghost_pre});
+			$line_str .= color("ghost", $name);
+			$line_str .= color("tree", $GRAPH{ghost_suf});
 		}
 		if ($shallow && $children) {
-			$line_str .= color("c_tree", " ($children)");
+			$line_str .= color("tree", " ($children)");
 		}
 		print "$line_str\n";
 
@@ -271,13 +273,17 @@ if ($opt{color} eq "auto") {
 }
 
 if ($opt{color} eq "256") {
-	$GRAPH{c_tree} = "\e[38;5;59m";
-	$GRAPH{c_ghost} = "\e[38;5;109m";
-	$GRAPH{c_reset} = "\e[m";
+	%COLOR = (
+		tree => "\e[38;5;59m",
+		ghost => "\e[38;5;109m",
+		reset => "\e[m",
+	);
 } elsif ($opt{color} !~ /^(no|off)$/) {
-	$GRAPH{c_tree} = "\e[36m";
-	$GRAPH{c_ghost} = "\e[36m";
-	$GRAPH{c_reset} = "\e[m";
+	%COLOR = (
+		tree => "\e[36m",
+		ghost => "\e[36m",
+		reset => "\e[m",
+	);
 }
 
 # parse input

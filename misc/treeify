@@ -117,37 +117,13 @@ sub show {
 	my $frdepth = defined($opt{fakeroot}) ? (2 - $opt{printfull}) : 0;
 
 	# Child tree indent level
-	my $sub_indent = 1;
+	my $sub_indent = $opt{sub_indent} // 1;
 	# Rightwards branch length
-	my $branch_pad = 1;
+	my $branch_pad = $opt{branch_pad} // 1;
 	# Whether child trees descend from the branch
-	my $sideways = false;
+	my $sideways = $opt{sideways} // false;
 	# Space between branch and label (currently sideways-only)
-	my $name_pad = 0;
-
-	if ($opt{style} eq "normal") {
-		1;
-	} elsif ($opt{style} eq "compact") {
-		$sub_indent = 0;
-	} elsif ($opt{style} eq "vcompact") {
-		$sub_indent = 0;
-		$branch_pad = 0;
-	} elsif ($opt{style} eq "sideways") {
-		$sideways = true;
-		$sub_indent = 0; # required
-		$name_pad = 1; # adjustable
-	} elsif ($opt{style} eq "sideways-compact") {
-		$sideways = true;
-		$sub_indent = 0;
-		$name_pad = 0;
-	} elsif ($opt{style} eq "sideways-vcompact") {
-		$sideways = true;
-		$sub_indent = 0;
-		$branch_pad = 0;
-		$name_pad = 0;
-	} else {
-		die "error: Unknown style '$opt{style}'\n";
-	}
+	my $name_pad = $opt{name_pad} // 0;
 
 	my @keys = keys %$branch;
 	if (eval {require Sort::Naturally}) {
@@ -257,6 +233,30 @@ for (@ARGV) {
 }
 
 # decide on output features
+
+if ($opt{style} eq "normal") {
+	1;
+} elsif ($opt{style} eq "compact") {
+	$opt{sub_indent} = 0;
+} elsif ($opt{style} eq "vcompact") {
+	$opt{sub_indent} = 0;
+	$opt{branch_pad} = 0;
+} elsif ($opt{style} eq "sideways") {
+	$opt{sideways} = true;
+	$opt{sub_indent} = 0; # required
+	$opt{name_pad} = 1; # adjustable
+} elsif ($opt{style} eq "sideways-compact") {
+	$opt{sideways} = true;
+	$opt{sub_indent} = 0;
+	$opt{name_pad} = 0;
+} elsif ($opt{style} eq "sideways-vcompact") {
+	$opt{sideways} = true;
+	$opt{sub_indent} = 0;
+	$opt{branch_pad} = 0;
+	$opt{name_pad} = 0;
+} else {
+	die "error: Unknown style '$opt{style}'\n";
+}
 
 if ($opt{color} eq "auto") {
 	my $term = (-t 1) ? $ENV{TERM} : undef;

@@ -162,6 +162,8 @@ sub show {
 			# from the branch, rather than from the name), even the
 			# root has a branch, therefore needs padding.
 			$graph->[$depth] = ($GRAPH{i_br} x $branch_pad);
+		} else {
+			$graph->[$depth] = "";
 		}
 
 		my $tree_str = join(" " x $sub_indent, @$graph);
@@ -173,6 +175,8 @@ sub show {
 			$graph->[$depth] = (@keys ? $GRAPH{s_mid} : $GRAPH{s_end}).($GRAPH{s_br} x $branch_pad);
 		} elsif ($sideways) {
 			$graph->[$depth] = ($GRAPH{s_br} x $branch_pad);
+		} else {
+			$graph->[$depth] = "";
 		}
 
 		my $line_str;

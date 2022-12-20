@@ -17,3 +17,12 @@ $ find /etc/apt -iname '*.list' | /tmp/treeify
           └─google-chrome.list
 ```
 
+<br>
+
+TODO: empty folder item maybe collpased ?
+```
+[/etc/apt]
+ ├─sources.list
+ └─[sources.list.d]
+    └─google-chrome.list
+```

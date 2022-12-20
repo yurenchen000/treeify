@@ -26,3 +26,8 @@ TODO: empty folder item maybe collpased ?
  └─[sources.list.d]
     └─google-chrome.list
 ```
+
+<br>
+
+similar tool:  
+https://github.com/dzamlo/treeify
